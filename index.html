@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <title>आधार कार्ड डिजाइन</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background: #f5f8fa; font-family: 'Poppins', Arial, sans-serif; }
+    .aadhaar-card {
+      width: 400px;
+      background: #fff;
+      margin: 40px auto;
+      border-radius: 13px;
+      box-shadow: 0 0 14px rgba(0,0,0,0.08);
+      padding: 19px 25px;
+      position: relative;
+      border: 2px solid #dadada;
+    }
+    .top-strip {
+      width: 100%;
+      height: 14px;
+      background: linear-gradient(90deg,#ffb800 0%,#ff8216 55%,#2bb153 100%);
+      margin-bottom: 5px;
+      border-radius: 3px;
+    }
+    .gov-india { color: #2bb153; margin: 10px 0 8px; font-weight: 700; letter-spacing: 1px; font-size: 15px;}
+    .logo {
+      position: absolute; top: 25px; left: 25px;
+      width: 38px;
+    }
+    .photo-box {
+      width: 70px; height: 75px;
+      border: 1.5px solid #333;
+      margin: 13px 0 5px 0;
+      background: #f7f7f7;
+      display: flex; align-items: center; justify-content: center;
+      float: left;
+      border-radius: 6px;
+    }
+    #photo-preview {
+      width: 65px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+    .details {
+      margin-left: 90px;
+      margin-bottom: 10px;
+      min-height: 75px;
+    }
+    .details p {
+      margin: 6px 0;
+      font-size: 14px;
+      color: #333;
+      line-height: 20px;
+    }
+    .qr-box {
+      position: absolute;
+      top: 102px;
+      right: 22px;
+      width: 82px;
+      height: 82px;
+      background: #fff;
+      border: 1.5px solid #333;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px;
+    }
+    .aadhaar-no {
+      clear: both;
+      font-family: 'Courier New', monospace;
+      font-size: 21px;
+      text-align: center;
+      margin: 19px 0 8px 0;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    .bottom-strip {
+      width: 100%;
+      height: 2px;
+      background: #d80019;
+      margin: 13px 0 6px 0;
+    }
+    .aadhaar-text {
+      text-align: center;
+      font-size: 13px;
+      color: #222;
+      margin-top: 7px;
+    }
+    .aadhaar-text span { color: #d80019; font-weight:700;}
+    #signature-preview {
+      display: block;
+      max-width: 140px;
+      max-height: 44px;
+      margin: 9px auto 2px auto;
+      padding: 0 0 0 0;
+    }
+    .sign-label {
+      text-align: right;
+      font-size: 12px;
+      color: #315380;
+      font-style: italic;
+      margin-bottom: 0;
+    }
+    #downloadBtn {
+      display: block;
+      margin: 15px auto 0;
+      background: #ffb800;
+      color: #333;
+      border: none;
+      font-size: 16px;
+      border-radius: 7px;
+      padding: 10px 29px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #downloadBtn[data-html2canvas-ignore="true"] { /* ignored on capture */ }
+    #aadhaarForm {
+      text-align: center;
+      margin-top: 20px;
+    }
+    #aadhaarForm input, #aadhaarForm select {
+      margin: 5px 0;
+      padding: 6px 11px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      width: 60%;
+      max-width: 240px;
+    }
+    #aadhaarForm label { margin-top: 7px; display: block; font-weight: 600; color: #333;}
+    #aadhaarForm .form-row { margin-bottom: 11px;}
+    #aadhaarForm button {
+      margin-top: 13px;
+      background: #2bb153;
+      color: #fff;
+      border: none;
+      font-size: 16px;
+      border-radius: 7px;
+      padding: 8px 20px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <form id="aadhaarForm">
+    <div class="form-row"><label for="name">नाम Name</label><input type="text" id="name" required></div>
+    <div class="form-row"><label for="dob">जन्म तिथि DOB</label><input type="date" id="dob" required></div>
+    <div class="form-row"><label for="gender">लिंग Gender</label><select id="gender" required>
+      <option value="MALE">MALE</option>
+      <option value="FEMALE">FEMALE</option>
+      <option value="OTHER">OTHER</option>
+    </select></div>
+    <div class="form-row"><label for="photo">फोटो Photo</label><input type="file" id="photo" accept="image/*"></div>
+    <div class="form-row"><label for="signature">हस्ताक्षर Signature</label><input type="file" id="signature" accept="image/*"></div>
+    <button type="submit">Generate Aadhaar Card</button>
+  </form>
+
+  <div class="aadhaar-card" id="cardPreview" style="display:none;">
+    <div class="top-strip"></div>
+    <span class="gov-india">भारत सरकार<br>GOVERNMENT OF INDIA</span>
+    <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Emblem_of_India.svg" alt="emblem">
+    <div class="photo-box"><img id="photo-preview" src="" alt="User"></div>
+    <div class="details">
+      <p id="pName"></p>
+      <p id="pDOB"></p>
+      <p id="pGender"></p>
+    </div>
+    <div class="qr-box"><div id="qrcode"></div></div>
+    <div class="aadhaar-no" id="aadhaar-no"></div>
+    <img id="signature-preview" src="" alt="Signature" style="display:none;">
+    <div class="sign-label" id="sign-label" style="display:none;">Signature/हस्ताक्षर</div>
+    <div class="bottom-strip"></div>
+    <div class="aadhaar-text"><span>आधार</span> - आम आदमी का अधिकार</div>
+    <button id="downloadBtn" data-html2canvas-ignore="true">Download Aadhaar Card</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    function getFakeAadhaar() {
+      let num = '';
+      for(let i=0; i<12; i++)
+        num += Math.floor(Math.random()*10);
+      return num.match(/.{1,4}/g).join(' ');
+    }
+    document.getElementById('aadhaarForm').onsubmit = function(e) {
+      e.preventDefault();
+      document.getElementById('cardPreview').style.display = 'block';
+      document.getElementById('pName').textContent = "Name: " + document.getElementById('name').value;
+      document.getElementById('pDOB').textContent = "DOB: " + document.getElementById('dob').value;
+      document.getElementById('pGender').textContent = "Gender: " + document.getElementById('gender').value;
+      document.getElementById('aadhaar-no').textContent = getFakeAadhaar();
+
+      const qrData = JSON.stringify({
+        name: document.getElementById('name').value,
+        dob: document.getElementById('dob').value,
+        gender: document.getElementById('gender').value,
+        aadhaar: document.getElementById('aadhaar-no').textContent
+      });
+      document.getElementById('qrcode').innerHTML = '';
+      new QRCode(document.getElementById('qrcode'), {
+        text: qrData,
+        width: 74,
+        height: 74
+      });
+
+      let photoFile = document.getElementById('photo').files[0];
+      if(photoFile) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('photo-preview').src = e.target.result;
+        };
+        reader.readAsDataURL(photoFile);
+      } else {
+        document.getElementById('photo-preview').src = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+      }
+
+      let signFile = document.getElementById('signature').files[0];
+      if(signFile) {
+        let signReader = new FileReader();
+        signReader.onload = function(e) {
+          document.getElementById('signature-preview').src = e.target.result;
+          document.getElementById('signature-preview').style.display = "block";
+          document.getElementById('sign-label').style.display = "block";
+        };
+        signReader.readAsDataURL(signFile);
+      } else {
+        document.getElementById('signature-preview').src = "";
+        document.getElementById('signature-preview').style.display = "none";
+        document.getElementById('sign-label').style.display = "none";
+      }
+    }
+
+    document.getElementById('downloadBtn').onclick = function() {
+      html2canvas(document.getElementById('cardPreview')).then(function(canvas) {
+        let link = document.createElement('a');
+        link.download = 'aadhaar_card.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>
