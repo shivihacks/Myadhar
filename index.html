@@ -2,17 +2,17 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <title>आधार कार्ड डिजाइन</title>
+  <title>आधार कार्ड सरकारी UI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { background: #f5f8fa; font-family: 'Poppins', Arial, sans-serif; }
     .aadhaar-card {
-      width: 400px;
+      width: 410px;
       background: #fff;
       margin: 40px auto;
       border-radius: 13px;
-      box-shadow: 0 0 14px rgba(0,0,0,0.08);
-      padding: 19px 25px;
+      box-shadow: 0 0 14px rgba(0,0,0,0.09);
+      padding: 18px 24px;
       position: relative;
       border: 2px solid #dadada;
     }
@@ -20,12 +20,12 @@
       width: 100%;
       height: 14px;
       background: linear-gradient(90deg,#ffb800 0%,#ff8216 55%,#2bb153 100%);
-      margin-bottom: 5px;
+      margin-bottom: 6px;
       border-radius: 3px;
     }
     .gov-india { color: #2bb153; margin: 10px 0 8px; font-weight: 700; letter-spacing: 1px; font-size: 15px;}
     .logo {
-      position: absolute; top: 25px; left: 25px;
+      position: absolute; top: 22px; left: 24px;
       width: 38px;
     }
     .photo-box {
@@ -45,18 +45,18 @@
     }
     .details {
       margin-left: 90px;
-      margin-bottom: 10px;
-      min-height: 75px;
+      margin-bottom: 11px;
+      min-height: 85px;
     }
     .details p {
-      margin: 6px 0;
+      margin: 4px 0;
       font-size: 14px;
       color: #333;
       line-height: 20px;
     }
     .qr-box {
       position: absolute;
-      top: 102px;
+      top: 107px;
       right: 22px;
       width: 82px;
       height: 82px;
@@ -87,20 +87,6 @@
       margin-top: 7px;
     }
     .aadhaar-text span { color: #d80019; font-weight:700;}
-    #signature-preview {
-      display: block;
-      max-width: 140px;
-      max-height: 44px;
-      margin: 9px auto 2px auto;
-      padding: 0 0 0 0;
-    }
-    .sign-label {
-      text-align: right;
-      font-size: 12px;
-      color: #315380;
-      font-style: italic;
-      margin-bottom: 0;
-    }
     #downloadBtn {
       display: block;
       margin: 15px auto 0;
@@ -113,7 +99,7 @@
       font-weight: 600;
       cursor: pointer;
     }
-    #downloadBtn[data-html2canvas-ignore="true"] { /* ignored on capture */ }
+    #downloadBtn[data-html2canvas-ignore="true"] { }
     #aadhaarForm {
       text-align: center;
       margin-top: 20px;
@@ -151,8 +137,9 @@
       <option value="FEMALE">FEMALE</option>
       <option value="OTHER">OTHER</option>
     </select></div>
+    <div class="form-row"><label for="father">पिता/पति का नाम Father/Husband Name</label><input type="text" id="father" required></div>
+    <div class="form-row"><label for="address">पूरा पता Address</label><input type="text" id="address" required></div>
     <div class="form-row"><label for="photo">फोटो Photo</label><input type="file" id="photo" accept="image/*"></div>
-    <div class="form-row"><label for="signature">हस्ताक्षर Signature</label><input type="file" id="signature" accept="image/*"></div>
     <button type="submit">Generate Aadhaar Card</button>
   </form>
 
@@ -165,11 +152,11 @@
       <p id="pName"></p>
       <p id="pDOB"></p>
       <p id="pGender"></p>
+      <p id="pFather"></p>
+      <p id="pAddress"></p>
     </div>
     <div class="qr-box"><div id="qrcode"></div></div>
     <div class="aadhaar-no" id="aadhaar-no"></div>
-    <img id="signature-preview" src="" alt="Signature" style="display:none;">
-    <div class="sign-label" id="sign-label" style="display:none;">Signature/हस्ताक्षर</div>
     <div class="bottom-strip"></div>
     <div class="aadhaar-text"><span>आधार</span> - आम आदमी का अधिकार</div>
     <button id="downloadBtn" data-html2canvas-ignore="true">Download Aadhaar Card</button>
@@ -180,8 +167,7 @@
   <script>
     function getFakeAadhaar() {
       let num = '';
-      for(let i=0; i<12; i++)
-        num += Math.floor(Math.random()*10);
+      for(let i=0; i<12; i++) num += Math.floor(Math.random()*10);
       return num.match(/.{1,4}/g).join(' ');
     }
     document.getElementById('aadhaarForm').onsubmit = function(e) {
@@ -190,12 +176,16 @@
       document.getElementById('pName').textContent = "Name: " + document.getElementById('name').value;
       document.getElementById('pDOB').textContent = "DOB: " + document.getElementById('dob').value;
       document.getElementById('pGender').textContent = "Gender: " + document.getElementById('gender').value;
+      document.getElementById('pFather').textContent = "Father/Husband: " + document.getElementById('father').value;
+      document.getElementById('pAddress').textContent = "Address: " + document.getElementById('address').value;
       document.getElementById('aadhaar-no').textContent = getFakeAadhaar();
 
       const qrData = JSON.stringify({
         name: document.getElementById('name').value,
         dob: document.getElementById('dob').value,
         gender: document.getElementById('gender').value,
+        father: document.getElementById('father').value,
+        address: document.getElementById('address').value,
         aadhaar: document.getElementById('aadhaar-no').textContent
       });
       document.getElementById('qrcode').innerHTML = '';
@@ -214,21 +204,6 @@
         reader.readAsDataURL(photoFile);
       } else {
         document.getElementById('photo-preview').src = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
-      }
-
-      let signFile = document.getElementById('signature').files[0];
-      if(signFile) {
-        let signReader = new FileReader();
-        signReader.onload = function(e) {
-          document.getElementById('signature-preview').src = e.target.result;
-          document.getElementById('signature-preview').style.display = "block";
-          document.getElementById('sign-label').style.display = "block";
-        };
-        signReader.readAsDataURL(signFile);
-      } else {
-        document.getElementById('signature-preview').src = "";
-        document.getElementById('signature-preview').style.display = "none";
-        document.getElementById('sign-label').style.display = "none";
       }
     }
 
